@@ -1,14 +1,19 @@
 
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import enums.Periods;
+import watherresponse.WeatherResponse;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 // В класс имплементирован интерфейс WeatherProvider.
 public class AccuWeatherProvider implements WeatherProvider {
@@ -57,7 +62,27 @@ public class AccuWeatherProvider implements WeatherProvider {
                             + "Температура: " + temperature + temperatureUnit);
               }  else throw new IOException("Сервер не вернул данных");
               System.out.println("Программа заканчивает работу.");
-              System.exit(0);
+
+
+              //  Создать класс WeatherResponse, десериализовать ответ сервера в экземпляр класса
+              // objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false); // Заглушка ошибок.
+              // Пишем в файл.
+              System.out.println("Пишем в файл респонс сервера.");
+              objectMapper.writeValue(new File("weatherJson.json"),  jsonResponse );
+
+              System.out.println(jsonResponse);
+              System.out.println("Провожу десерелизацию в класс WeatherResponse");
+
+              WeatherResponse[] weatherResponse = objectMapper.readValue(jsonResponse, WeatherResponse[].class);
+
+              // Закомментированные ниже методы также успешно отрабатывают.
+              // List<WeatherResponse> weatherResponse = objectMapper.readValue(jsonResponse, new TypeReference<List<WeatherResponse>>() {});
+              // List<WeatherResponse> weatherResponse = objectMapper.readValue(jsonResponse,objectMapper.getTypeFactory().constructCollectionType(List.class, WeatherResponse.class));
+              System.out.println(weatherResponse.toString());
+
+
+            System.out.println("Программа заканчивает работу.");
+            System.exit(0);
 
         // На пять дней. Урл имеет другие сегменты!!!
           case FIVE_DAYS:
@@ -100,13 +125,13 @@ public class AccuWeatherProvider implements WeatherProvider {
 
           }
 
-              System.out.println("Провожу десерелизацию в класс WeatherResponse");
-              //  Создать класс WeatherResponse, десериализовать ответ сервера в экземпляр класса
-              objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-              WeatherResponse weatherResponse = objectMapper.readValue(jsonResponseFive, WeatherResponse.class);
-              System.out.println(weatherResponse.toString());
-              System.out.println("Программа заканчивает работу.");
-              System.exit(0);
+//            System.out.println("Провожу десерелизацию в класс WeatherResponse");
+//            //  Создать класс WeatherResponse, десериализовать ответ сервера в экземпляр класса
+//            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+//            WeatherResponse weatherResponse = objectMapper.readValue(jsonResponseFive, WeatherResponse.class);
+//            System.out.println(weatherResponse.toString());
+//            System.out.println("Программа заканчивает работу.");
+//            System.exit(0);
      }
 
 
